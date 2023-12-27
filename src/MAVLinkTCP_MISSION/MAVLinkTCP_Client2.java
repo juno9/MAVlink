@@ -8,6 +8,7 @@ import com.MAVLink.Takeoff;
 import com.MAVLink.common.msg_command_ack;
 import com.MAVLink.common.msg_mission_count;
 import com.MAVLink.common.msg_mission_item_int;
+import com.MAVLink.common.msg_mission_request_int;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_RESULT;
 
@@ -52,7 +53,7 @@ public class MAVLinkTCP_Client2 {
         Socket socket;
         int port = 10000;//연결할 포트
         int systemid = 0;//GCS니까 시스템 ID는 0번을 할당
-        System.out.println("<<Client>>");
+        System.out.println("<< GCS >>");
         try {
             socket = new Socket(ip, port);//연결할 주소와 포트를 매개변수로 소켓 객체를 생성함
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));//서버에서 보내온 데이터를 읽어올 객체
@@ -117,7 +118,7 @@ public class MAVLinkTCP_Client2 {
 
                         for (int i = 0; i < bytesRead; i++) {//배열의 길이만큼 반복하며 메시지를 파싱한다 바이트로 전달받은 데이터를 배열에 집어넣고
 
-                            System.out.println("반복횟수 :" + (i + 1));
+
                             MAVLinkPacket packet = mMavlinkParser.mavlink_parse_char(input[i] & 0xff); // & : 비트 연산(논리 곱)
                             //배열에 있는 아이템을 파싱(분석)하여 패킷으로 선언한다.->바이트 데이터를 파싱을통해 유의미한 데이터로 가공한다.
                             // 한 바이트씩 받아서 프레임에 맞게 재구성하는 것이 파싱이다.(중요)
@@ -130,9 +131,9 @@ public class MAVLinkTCP_Client2 {
                                 int targetsystem = msg.sysid;//메시지를 날려온 드론의 ID를 식별해야 함
                                 switch (msg.msgid) {
                                     case MAVLINK_MSG_ID_MISSION_REQUEST_INT://만약 메세지 ID가 MISSION_REQUEST_INT 라면
-                                        msg_mission_item_int msg_mission_item_int = new msg_mission_item_int();
-                                        msg_mission_item_int.mission_type = 1;
-                                        msg_mission_item_int.target_system = (short) targetsystem;//타겟 시스템(명령을 보낼 드론기체의 ID) 할당
+                                        msg_mission_request_int msg_mission_request_int = (msg_mission_request_int)msg;
+                                        System.out.println("받은 seq : "+msg_mission_request_int.seq);
+
 
                                 }
                             }

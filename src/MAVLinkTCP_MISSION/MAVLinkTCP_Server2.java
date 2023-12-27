@@ -44,7 +44,7 @@ public class MAVLinkTCP_Server2 {
 //    빈 임무를 업로드하는 것(MISSION_COUNT가 0)은 임무를 지우는 것과 동일한 효과를 갖습니다.
 
     public static void main(String[] args) throws IOException {
-        System.out.println("<<Server>>");
+        System.out.println("<< DRONE >>");
         ServerSocket serverSocket = null;
         int systemid = 1;//1번 기기라는 설정
 // 포트 사용 가능 여부 판단
@@ -110,7 +110,7 @@ public class MAVLinkTCP_Server2 {
                     byte[] input = new byte[2000];//1바이트 객체를 300개 선언한다
                     int bytesRead = bis.read(input);//인풋 스트림에서 읽어온 데이터를 input배열에 저장하고 bytesRead에는 읽어야 할 배열의 길이가 할당된다
                     for (int i = 0; i < bytesRead; i++) {//패킷 단위로 데이터를 쪼개준다
-                        System.out.println("반복횟수 : " + (i + 1));//메시지 확인
+
                         MAVLinkPacket packet = mMavlinkParser.mavlink_parse_char(input[i] & 0xff);
                         if (packet != null) {
                             MAVLinkMessage msg = packet.unpack();//
@@ -126,6 +126,9 @@ public class MAVLinkTCP_Server2 {
                                     if(msg_mission_count.target_system == systemid){//날아온 메시지의 타겟 시스템id와 이 메시지를 받은 시스템의 id가 같다면
                                         int count = msg_mission_count.count;//받은 메시지_미션_카운트 객체에서 미션 갯수 추출하여 count객체에 할당
                                         System.out.println("GCS 에서 날아온 아이템 갯수 : " + count);//콘솔에 GCS에서 날아온 미션 갯수 출력
+                                    } else {
+                                       //여기에 관제에서 드론에 보낸 메시지가 번지수를 잘못찾은 경우를 분기하려 했는데 생각해보니 그럼 연결도 안되어 있어야 맞다.
+
                                     }
 
                                     // 1. GCS에서 드론으로 MISSION_COUNT 메시지를 보냅니다. 이 메시지에는 업로드할 임무 항목의 수가 포함됩니다.------------------------------------------
